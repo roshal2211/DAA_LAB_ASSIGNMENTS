@@ -1,0 +1,63 @@
+#include <stdio.h>
+#define N 100
+
+void add(int A[N][N],int B[N][N],int C[N][N],int n,int s){
+    for(int i=0;i<n;i++)for(int j=0;j<n;j++)C[i][j]=A[i][j]+s*B[i][j];
+}
+
+void strassen(int A[N][N],int B[N][N],int C[N][N],int n){
+    if(n==1){C[0][0]=A[0][0]*B[0][0];return;}
+
+    int k=n/2,i,j;
+    int a[N][N]={0},b[N][N]={0},c[N][N]={0},d[N][N]={0};
+    int e[N][N]={0},f[N][N]={0},g[N][N]={0},h[N][N]={0};
+    int p[N][N],q[N][N],r[N][N],s[N][N],t[N][N],u[N][N],v[N][N];
+    int x[N][N],y[N][N];
+
+    for(i=0;i<k;i++)for(j=0;j<k;j++){
+        a[i][j]=A[i][j]; b[i][j]=A[i][j+k];
+        c[i][j]=A[i+k][j]; d[i][j]=A[i+k][j+k];
+        e[i][j]=B[i][j]; f[i][j]=B[i][j+k];
+        g[i][j]=B[i+k][j]; h[i][j]=B[i+k][j+k];
+    }
+
+    add(a,d,x,k,1); add(e,h,y,k,1); strassen(x,y,p,k);
+    add(c,d,x,k,1); strassen(x,e,q,k);
+    add(f,h,y,k,-1); strassen(a,y,r,k);
+    add(g,e,y,k,-1); strassen(d,y,s,k);
+    add(a,b,x,k,1); strassen(x,h,t,k);
+    add(c,a,x,k,-1); add(e,f,y,k,1); strassen(x,y,u,k);
+    add(b,d,x,k,-1); add(g,h,y,k,1); strassen(x,y,v,k);
+
+    for(i=0;i<k;i++)for(j=0;j<k;j++){
+        C[i][j]=p[i][j]+s[i][j]-t[i][j]+v[i][j];
+        C[i][j+k]=r[i][j]+t[i][j];
+        C[i+k][j]=q[i][j]+s[i][j];
+        C[i+k][j+k]=p[i][j]-q[i][j]+r[i][j]+u[i][j];
+    }
+}
+
+int power2(int n){
+    int p=1;
+    while(p<n)p*=2;
+    return p;
+}
+
+int main(){
+    int A[N][N]={0},B[N][N]={0},C[N][N]={0};
+    int r1,c1,r2,c2,n;
+
+    scanf("%d%d",&r1,&c1);
+    for(int i=0;i<r1;i++)
+        for(int j=0;j<c1;j++)scanf("%d",&A[i][j]);
+
+    scanf("%d%d",&r2,&c2);
+
+    if(c1!=r2){
+        printf("Invalid input");
+        return 0;
+    }
+
+    for(int i=0;i<r2;i++)
+        for(int j=0;j<c2;j++)scanf("%d",&B[i][j]);
+}
