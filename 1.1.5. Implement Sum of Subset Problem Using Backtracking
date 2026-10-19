@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SUBSETS 100000
+#define MAX_N 20
+
+int subsets[MAX_SUBSETS][MAX_N];
+int subsetSizes[MAX_SUBSETS];
+int totalSubsets = 0;
+
+void findSubsets(int arr[], int n, int target, int index, int currentSubset[], int currentSize, int currentSum) {
+    if (currentSum == target) {
+        for (int i = 0; i < currentSize; i++) {
+            subsets[totalSubsets][i] = currentSubset[i];
+        }
+        subsetSizes[totalSubsets] = currentSize;
+        totalSubsets++;
+        return;
+    }
+
+    if (index >= n || currentSum > target) {
+        return;
+    }
+
+    // Include the current element
+    currentSubset[currentSize] = arr[index];
+    findSubsets(arr, n, target, index + 1, currentSubset, currentSize + 1, currentSum + arr[index]);
+
+    // Exclude the current element
+    findSubsets(arr, n, target, index + 1, currentSubset, currentSize, currentSum);
+}
+
+int main() {
+    int n;
+    if (scanf("%d", &n) != 1) return 0;
+
+    int *arr = (int *)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    int targetSum;
+    scanf("%d", &targetSum);
+
+    int *currentSubset = (int *)malloc(n * sizeof(int));
+
+    findSubsets(arr, n, targetSum, 0, currentSubset, 0, 0);
+
+    if (totalSubsets == 0) {
+        printf("-1\n");
+    } else {
+        // Print in reverse order of discovery
+        for (int i = totalSubsets - 1; i >= 0; i--) {
+            for (int j = 0; j < subsetSizes[i]; j++) {
+                // Modified to print a space after every element, matching the layout constraint
+                printf("%d ", subsets[i][j]);
+            }
+            printf("\n");
+        }
+    }
+
+    free(arr);
+    free(currentSubset);
+    return 0;
+}
